@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Script from "next/script";
+import Navbar from "./components/NavBar";
+import { LoginProvider } from "./context/LoginProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,8 +18,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="cz">
+      <Script src="dist/notiflix-aio-3.2.7.min.js"></Script>
+      <body className="montserrat">
+        <LoginProvider>
+          <Navbar />
+          <div className="p-4">{children}</div>
+        </LoginProvider>
+      </body>
     </html>
   );
 }
