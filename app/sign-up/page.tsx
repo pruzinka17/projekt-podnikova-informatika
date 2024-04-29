@@ -1,38 +1,47 @@
 "use client";
 
-import { doc, getDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import Link from "next/link";
 import { useState } from "react";
 import { db } from "../firebase";
-import Notiflix from "notiflix";
 import useLogin from "../context/LoginProvider";
 
-export default function SignIn() {
+export default function SignUp() {
   const { name, setName, email, setEmail, role, setRole } = useLogin();
 
+  const [formName, formSetName] = useState("");
   const [formEmail, formSetEmail] = useState("");
   const [formPassword, formSetPassword] = useState("");
 
-  const login = async () => {
-    const docRef = doc(db, "users", formEmail);
-    const docSnap = await getDoc(docRef);
+  const signUp = async () => {
+    await setDoc(doc(db, "users", formEmail), {
+      name: formName,
+      email: formEmail,
+      password: formPassword,
+      role: "user",
+      reserved: [],
+    });
+    setName(formName);
+    setEmail(formEmail);
+    setRole("user");
 
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-
-      if (formPassword == data.password) {
-        setName(data.name);
-        setEmail(data.email);
-        setRole(data.role);
-        formSetEmail("");
-        formSetPassword("");
-      }
-    } else {
-      Notiflix.Notify.failure("chybne udaje");
-    }
+    formSetName("");
+    formSetEmail("");
+    formSetPassword("");
   };
   return (
     <div className="w-full h-[60vh] flex flex-col items-center justify-center space-y-4">
+      <label className="flex flex-col space-y-2 w-1/6">
+        Jméno
+        <input
+          type="text"
+          value={formName}
+          onChange={(event) => {
+            formSetName(event.target.value);
+          }}
+          className="rounded bg-slate-200 p-2"
+        ></input>
+      </label>
       <label className="flex flex-col space-y-2 w-1/6">
         Email
         <input
@@ -55,8 +64,8 @@ export default function SignIn() {
           className="rounded bg-slate-200 p-2"
         ></input>
       </label>
-      <button onClick={login}>Přihlásit</button>
-      <Link href="/sign-up">Registrace</Link>
+      <button onClick={signUp}>Registrovat</button>
+      <Link href="/sign-in">Přihlášení</Link>
     </div>
   );
 }
